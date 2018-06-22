@@ -20,7 +20,8 @@ int max(int a, int b){
  * T(n) = 1 ; O() = 1;
 */
 int getHeight(Node* n){
-    return n == NULL? 0 : n->h;
+    if (n == NULL) return 0;
+    return n->h;
 }
 
 /**
@@ -84,8 +85,8 @@ Node* rightRotation(Node* root){
     newRoot->rightChild = root;
     root->leftChild = aux;
 
-    newRoot->h = max(getHeight(newRoot->leftChild), getHeight(newRoot->rightChild));
-    root->h = max(getHeight(root->leftChild), getHeight(root->rightChild));
+    root->h = 1 + max(getHeight(root->leftChild), getHeight(root->rightChild));
+    newRoot->h = 1 + max(getHeight(newRoot->leftChild), getHeight(newRoot->rightChild));
 
     return newRoot;
 }
@@ -103,8 +104,8 @@ Node* leftRotation(Node* root){
     newRoot->leftChild = root;
     root->rightChild = aux;
 
-    newRoot->h = max(getHeight(newRoot->leftChild), getHeight(newRoot->rightChild));
-    root->h = max(getHeight(root->leftChild), getHeight(root->rightChild));
+    root->h = 1 + max(getHeight(root->leftChild), getHeight(root->rightChild));
+    newRoot->h = 1 + max(getHeight(newRoot->leftChild), getHeight(newRoot->rightChild));
 
     return newRoot;
 }
@@ -176,11 +177,11 @@ Node* add(Node* root, Client* client, char* key){
 
     #pragma region Arbol desbalanceado hacia la derecha
     // Right - right
-    if ((balance > 1) && (strcmp(key, root->leftChild->key) > 0)){
+    if ((balance > 1) && (strcmp(key, root->rightChild->key) > 0)){
         return leftRotation(root);
     }
     //Right - left
-    if ((balance > 1) && (strcmp(key, root->leftChild->key) < 0)){
+    if ((balance > 1) && (strcmp(key, root->rightChild->key) < 0)){
         root->rightChild = rightRotation(root->rightChild);
         return leftRotation(root);
     }
@@ -270,7 +271,7 @@ AvlTree* loadClients(char* filePath){
         strcpy(newClient->vaccine, info);
         // Fecha del proximo control
         info = strtok(NULL, " ");
-        info = strtok(NULL, "\n");
+        //info = strtok(NULL, "\n");
         strcpy(newClient->nextControlDate, info);
         #pragma endregion
         // Añadir el cliente al arbol

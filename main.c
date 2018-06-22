@@ -4,5 +4,6 @@
 #include "functions.h"
 int main(int argc, char const *argv[])
 {
+    AvlTree* tree = loadClients("Bultos.in");
     return 0;
 }
