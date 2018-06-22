@@ -180,7 +180,7 @@ Node* add(Node* root, Client* client, char* key){
     if ((balance > 1) && (strcmp(key, root->rightChild->key) > 0)){
         return leftRotation(root);
     }
-    //Right - left
+    // Right - left
     if ((balance > 1) && (strcmp(key, root->rightChild->key) < 0)){
         root->rightChild = rightRotation(root->rightChild);
         return leftRotation(root);
@@ -282,4 +282,28 @@ AvlTree* loadClients(char* filePath){
     fclose(file);
     free(line);
     return tree;
+}
+
+/**
+ * Busca un lista de clientes en el arbol segun su nombre.
+ * char* query : nombre del cliente a buscar.
+ * salida: ListClient*.
+ * T(n) = ; O() = 
+*/
+ClientList* searchClientList(Node* root, char* query){
+    // Casos base
+    if (root == NULL){
+        return NULL;
+    }
+    if (strcmp(query, root->key) == 0){
+        return root->clients;
+    }
+    // Query es menor -> buscar en la izquierda
+    if (strcmp(query, root->key) < 0){
+        return searchClientList(root->leftChild, query);
+    }
+    // Query es mayor -> buscar en la derecha
+    if (strcmp(query, root->key) > 0){
+        return searchClientList(root->rightChild, query);
+    }
 }
