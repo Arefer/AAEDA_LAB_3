@@ -13,4 +13,5 @@ int getBalance(Node* n);
 Node* add(Node* root, Client* client, char* key);
 Client* createNewClient();
 AvlTree* loadClients(char* filePath);
-#endif /* FUNCTIONS_H */
+ClientList* searchClientList(Node* root, char* query);
+#endif /* FUNCTIONS_H */ 
