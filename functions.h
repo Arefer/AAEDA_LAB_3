@@ -5,6 +5,7 @@
 int max(int a, int b);
 int getHeight(Node* n);
 Node* createNewNode();
+Node* copyNode(Node* n);
 ClientList* createNewClientList();
 void addToList(Client* client, ClientList* list);
 Node* rightRotation(Node* root);
@@ -13,6 +14,6 @@ int getBalance(Node* n);
 int customComparer(char* key1, char* key2);
 Node* add(Node* root, Client* client, char* key);
 Client* createNewClient();
-AvlTree* loadClients(char* filePath);
-ClientList* searchClientList(Node* root, char* query);
+Data* loadClients(char* filePath);
+Node* findNode(Node* root, char* query);
 #endif /* FUNCTIONS_H */ 

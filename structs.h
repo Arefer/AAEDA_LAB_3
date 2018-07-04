@@ -2,7 +2,7 @@
 #define STRUCTS_H
 
 struct client{
-    int id;
+    char* id;
     char* ownerName;
     char* lastName1;
     char* lastName2;
@@ -38,4 +38,10 @@ struct avlTree{
     int length;
 };
 typedef struct avlTree AvlTree;
+
+struct data{
+    AvlTree* namesTree;
+    AvlTree* idsTree;
+};
+typedef struct data Data;
 #endif /* STRUCTS_H */

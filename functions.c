@@ -27,7 +27,7 @@ int getHeight(Node* n){
 /**
  * Crea un nuevo Node con altura 1 y los demas datos vacios.
  * salida: Node*.
- * T(n) = 6 ; O() = 1;
+ * T(n) = 6 ; O() = 1.
 */
 Node* createNewNode(){
     Node* newNode = (Node*)malloc(sizeof(Node));
@@ -37,6 +37,22 @@ Node* createNewNode(){
     newNode->leftChild = NULL;
     newNode ->rightChild = NULL;
     return newNode; 
+}
+
+/**
+ * Copia el contenido de un Node a otro (que se crea en esta funcion).
+ * Node* n : Node a copiar.
+ * salida: Node*
+ * T(n) = 6 ; O() = 1.
+ */
+Node* copyNode(Node* n){
+    Node* newNode = createNewNode();
+    newNode->h = n->h;
+    newNode->key = n->key;
+    newNode->clients = n->clients;
+    newNode->leftChild = n->leftChild;
+    newNode ->rightChild = n->rightChild;
+    return newNode;
 }
 
 /**
@@ -124,13 +140,20 @@ int getBalance(Node* n){
 
 /**
  * Compara key1 y key2 como numero o como string.
- * char* key1 
+ * En el caso de ser numeros, la salida es 1 cuando key1 es mayor a key2
+ * y -1 en caso contrario.
+ * En el caso de ser strings, se utiliza strcmp.
+ * char* key1: primera key a comparar con respecto a key2.
+ * char* keyy2: segunda key a comparar con respecto a key1.
+ * Salida: int
+ * T(n) = 4 ; 0() = 1
  */
 int customComparer(char* key1, char* key2){
     int k1 = atoi(key1);
     int k2 = atoi(key2);
-    // Si key1 y key2 pueden ser convertida a numeros
+    // Si key1 y key2 pueden ser convertidas a numeros
     if (k1 != 0 && k2 != 0){
+        if (k1 == k2) return 0;
         return k1 > k2 ? 1 : -1;
     }
     // Sino tratarlas como strings
@@ -157,16 +180,16 @@ Node* add(Node* root, Client* client, char* key){
     }
     // Si key es mayor a la key de root
     // Agregar a la derecha 
-    if (strcmp(key, root->key) > 0){
+    if (customComparer(key, root->key) > 0){
         root->rightChild = add(root->rightChild, client, key);
     }
     // Si key es menor a la key de root
     // Agregar a la izquierda
-    if (strcmp(key, root->key) < 0){
+    if (customComparer(key, root->key) < 0){
         root->leftChild = add(root->leftChild, client, key);
     }
     // Si key es igual a key de root (dos clientes se llaman igual)
-    if (strcmp(key, root->key) == 0){
+    if (customComparer(key, root->key) == 0){
         // Añadir el cliente a una lista
         addToList(client, root->clients);
         return root;
@@ -179,11 +202,11 @@ Node* add(Node* root, Client* client, char* key){
 
     #pragma region Arbol desbalanceado hacia la izquierda 
     // Left - left
-    if ((balance < -1) && (strcmp(key, root->leftChild->key) < 0)){
+    if ((balance < -1) && (customComparer(key, root->leftChild->key) < 0)){
         return rightRotation(root);
     }
     // Left - Right
-    if ((balance < -1) && (strcmp(key, root->leftChild->key) > 0)){
+    if ((balance < -1) && (customComparer(key, root->leftChild->key) > 0)){
         root->leftChild = leftRotation(root->leftChild);
         return rightRotation(root);
     }
@@ -191,11 +214,11 @@ Node* add(Node* root, Client* client, char* key){
 
     #pragma region Arbol desbalanceado hacia la derecha
     // Right - right
-    if ((balance > 1) && (strcmp(key, root->rightChild->key) > 0)){
+    if ((balance > 1) && (customComparer(key, root->rightChild->key) > 0)){
         return leftRotation(root);
     }
     // Right - left
-    if ((balance > 1) && (strcmp(key, root->rightChild->key) < 0)){
+    if ((balance > 1) && (customComparer(key, root->rightChild->key) < 0)){
         root->rightChild = rightRotation(root->rightChild);
         return leftRotation(root);
     }
@@ -229,14 +252,19 @@ Client* createNewClient(){
  * salida: Node* root.
  * T(n) = ; O() = 
 */
-AvlTree* loadClients(char* filePath){
+Data* loadClients(char* filePath){
     #pragma region Variables
     // Arbol de clientes
-    AvlTree* tree = (AvlTree*)malloc(sizeof(AvlTree));
+    Data* d = (Data*)malloc(sizeof(Data));
+    d->idsTree = (AvlTree*)malloc(sizeof(AvlTree));
+    d->idsTree->length = 0;
+    d->namesTree = (AvlTree*)malloc(sizeof(AvlTree));
+    d->namesTree->length = 0;
     FILE* file;
     char* line = (char*)malloc(sizeof(char)*180);
     strcpy(line, "");
     int i = 0;
+    int l = 0;
     #pragma endregion
     
     // Inicializacion del archivo
@@ -246,15 +274,17 @@ AvlTree* loadClients(char* filePath){
         exit(-1);
     }
     // Cantidad de clientes 
-    fscanf(file, "%d", &tree->length);
+    fscanf(file, "%d", &l);
     // Salto de linea pendiente
     fgets(line, sizeof(line), file);
     // Primera linea
     fgets(line, 180, file);
     
-    while(i < tree->length){
+    while(i < l){
         char* info;
         Client* newClient = createNewClient();
+        newClient->id = (char*)malloc(sizeof(char)*10);
+        sprintf(newClient->id, "%d", i+1);
         #pragma region Separacion de datos
         // Nombre
         info = strtok(line, " ");
@@ -288,36 +318,39 @@ AvlTree* loadClients(char* filePath){
         //info = strtok(NULL, "\n");
         strcpy(newClient->nextControlDate, info);
         #pragma endregion
-        // Añadir el cliente al arbol
-        tree->root = add(tree->root, newClient, newClient->ownerName);
+        // Añadir el cliente al arbol de nombres
+        d->namesTree->root = add(d->namesTree->root, newClient, newClient->ownerName);
+        // Añadir al cliente al arbol de ids
+        d->idsTree->root = add(d->idsTree->root, newClient, newClient->id);
+        d->namesTree->length += 1;
+        d->idsTree->length += 1;
         i++;
         fgets(line, 180, file);
     }
     fclose(file);
     free(line);
-    return tree;
+    return d;
 }
 
 /**
- * Busca un lista de clientes en el arbol segun su nombre.
- * char* query : nombre del cliente a buscar.
- * salida: ListClient*.
- * T(n) = ; O() = 
+ * Busca un Node* con la key pasada por parametro.
+ * char* key : key a buscar.
+ * salida: Node*
+ * T(n) = ; 0() = 
 */
-ClientList* searchClientList(Node* root, char* query){
-    // Casos base
+Node* findNode(Node* root, char* key){
     if (root == NULL){
         return NULL;
     }
-    if (strcmp(query, root->key) == 0){
-        return root->clients;
+    if (customComparer(key, root->key) == 0){
+        return root;
     }
-    // Query es menor -> buscar en la izquierda
-    if (strcmp(query, root->key) < 0){
-        return searchClientList(root->leftChild, query);
+    // key buscada es menor -> buscar en la izquierda
+    if (customComparer(key, root->key) < 0){
+        return findNode(root->leftChild, key);
     }
-    // Query es mayor -> buscar en la derecha
-    if (strcmp(query, root->key) > 0){
-        return searchClientList(root->rightChild, query);
+    // key buscada es mayor -> buscar en la derecha
+    if (customComparer(key, root->key) > 0){
+        return findNode(root->rightChild, key);
     }
 }
