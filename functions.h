@@ -10,6 +10,7 @@ void addToList(Client* client, ClientList* list);
 Node* rightRotation(Node* root);
 Node* leftRotation(Node* root);
 int getBalance(Node* n);
+int customComparer(char* key1, char* key2);
 Node* add(Node* root, Client* client, char* key);
 Client* createNewClient();
 AvlTree* loadClients(char* filePath);

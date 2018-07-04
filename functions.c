@@ -123,6 +123,20 @@ int getBalance(Node* n){
 }
 
 /**
+ * Compara key1 y key2 como numero o como string.
+ * char* key1 
+ */
+int customComparer(char* key1, char* key2){
+    int k1 = atoi(key1);
+    int k2 = atoi(key2);
+    // Si key1 y key2 pueden ser convertida a numeros
+    if (k1 != 0 && k2 != 0){
+        return k1 > k2 ? 1 : -1;
+    }
+    // Sino tratarlas como strings
+    return strcmp(key1, key2);
+}
+/**
  * Añade un Node al arbol (sin desbalancearlo) dada su raiz y retorna la nueva raiz.
  * Node* root : raiz del arbol.
  * Client* client : Client a agregar al arbol.
